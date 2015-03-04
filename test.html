@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>planlist.js example</title>
+    <script type="text/javascript" src="planlist.js"></script>
+</head>
+<body>
+
+
+<style>
+    ul, pre, div, h4  {
+        margin: 0;
+    }
+
+    .test  {
+        margin-top: 12px;
+        background-color: #F0F0F0;
+    }
+    .test > pre > span  {
+        background-color: #E0E0E0;
+    }
+    .test > *  {
+        display: inline-block;
+        vertical-align: top;
+    }
+    .test > *:nth-child(1)  {
+        width: 25%;
+    }
+    .test > *:nth-child(2)  {
+        left: 25%; width: 25%;
+    }
+    .test > *:nth-child(3)  {
+        right: 25%; width: 25%;
+    }
+    .test > *:nth-child(4)  {
+        right: 0; width: 25%;
+    }
+    .test > pre > span > code  {
+        color: #60A020;
+    }
+    .test.error  {
+        background-color: #FFD0D0;
+    }
+
+    #tests-header  {
+        background-color: #E0D4C0;
+    }
+</style>
+
+
+<div id="tests-header" class="test"><h4>source code</h4><h4>result view</h4><h4>result code</h4><h4>expected code</h4></div>
+
+<div id="tests-content"></div>
+
+
+<script>
+
+    window.onload = function()  {
+        var tests = [
+            // пустой вход - пустой выход
+            "",
+            "",
+            // пробельные символы и пустая строка в конце тоже игнорируются
+            "  \t\n",
+            "",
+            // а это уже даст новую строку
+            "\n\n",
+            "<br>\n",
+            //
+            "\n ",
+            "<br>\n",
+            // simple text
+            "text",
+            "text",
+            // лидирующие пробелы не сохраняются
+            "  spaced text ",
+            "spaced text ",
+            // перенос на новую строчку создает <br>, последняя пустая строка игнорируется
+            " text on one line\n" +
+            "   text on next line\n",
+            "text on one line<br>\n" +
+            "text on next line",
+            //
+            "text, empty lines at the end\n\n",
+            "text, empty lines at the end<br>\n",
+
+            // одиночный элемент списка
+            ". item",
+            "<ul>\n" +
+            "<li>item</li>\n" +
+            "</ul>",
+            // с пробелами
+            "   . item",
+            "<ul>\n" +
+            "   <li>item</li>\n" +
+            "</ul>",
+            // новая строка
+            "\n" +
+            ". item",
+            "<br>\n" +
+            "<ul>\n" +
+            "<li>item</li>\n" +
+            "</ul>",
+            //
+            "xxx\n" +
+            "  . item",
+            "xxx<br>\n" +
+            "<ul>\n" +
+            "  <li>item</li>\n" +
+            "</ul>",
+            //
+            "  . item\n" +
+            "xxx",
+            "<ul>\n" +
+            "  <li>item</li>\n" +
+            "</ul>\n" +
+            "xxx",
+
+            // два элемента
+            "   . item 1\n" +
+            "   . item 2",
+            "<ul>\n" +
+            "   <li>item 1</li>\n" +
+            "   <li>item 2</li>\n" +
+            "</ul>",
+            //
+            "   . item 1\n" +
+            "    . item 2",
+            "<ul>\n" +
+            "   <li>item 1<br>\n" +
+            "    <ul>\n" +
+            "    <li>item 2</li>\n" +
+            "    </ul>\n" +
+            "   </li>\n" +
+            "</ul>",
+            //
+            "   . item 1\n" +
+            "  . item 2",
+            "<ul>\n" +
+            "   <li>item 1</li>\n" +
+            "</ul>\n" +
+            "<ul>\n" +
+            "  <li>item 2</li>\n" +
+            "</ul>",
+            // текст на другой строчке
+            "   . item 1\n" +
+            "   text 1\n" +
+            "       text 2\n",
+            "<ul>\n" +
+            "   <li>item 1<br>\n" +
+            "       text 1<br>\n" +
+            "       text 2</li>\n" +
+            "</ul>",
+            //
+            "     text\n" +
+            "   . item 1\n" +
+            "     text\n" +
+            "   . item 2\n",
+            "text<br>\n" +
+            "<ul>\n" +
+            "   <li>item 1<br>\n" +
+            "       text</li>\n" +
+            "   <li>item 2</li>\n" +
+            "</ul>",
+            //
+            "    . item 1\n" +
+            "  text\n" +
+            "    . item 2\n",
+            "<ul>\n" +
+            "    <li>item 1</li>\n" +
+            "</ul>\n" +
+            "text<br>\n" +
+            "<ul>\n" +
+            "    <li>item 2</li>\n" +
+            "</ul>",
+            //
+            "    . item 1\n" +
+            "  text 1\n" +
+            "  text 2\n" +
+            "    . item 2\n" +
+            "  text 3",
+            "<ul>\n" +
+            "    <li>item 1</li>\n" +
+            "</ul>\n" +
+            "text 1<br>\n" +
+            "text 2<br>\n" +
+            "<ul>\n" +
+            "    <li>item 2</li>\n" +
+            "</ul>\n" +
+            "text 3",
+
+            // третий уровень вложенности
+            "   . item 1\n" +
+            "      . item 2\n" +
+            "         . item 3\n"
+            ,
+            "<ul>\n" +
+            "   <li>item 1<br>\n" +
+            "      <ul>\n" +
+            "      <li>item 2<br>\n" +
+            "         <ul>\n" +
+            "         <li>item 3</li>\n" +
+            "         </ul>\n" +
+            "      </li>\n" +
+            "      </ul>\n" +
+            "   </li>\n" +
+            "</ul>"
+            ,
+            //
+            "   . item 1\n" +
+            "     . item 2\n" +
+            "    . item 3\n"
+            ,
+            "<ul>\n" +
+            "   <li>item 1<br>\n" +
+            "     <ul>\n" +
+            "     <li>item 2</li>\n" +
+            "     </ul>\n" +
+            "    <ul>\n" +
+            "    <li>item 3</li>\n" +
+            "    </ul>\n" +
+            "   </li>\n" +
+            "</ul>"
+            ,
+            //
+            "   . item 1\n" +
+            "      . item 2.1\n" +
+            "         . item 3\n" +
+            "      . item 2.2\n"
+            ,
+            "<ul>\n" +
+            "   <li>item 1<br>\n" +
+            "      <ul>\n" +
+            "      <li>item 2.1<br>\n" +
+            "         <ul>\n" +
+            "         <li>item 3</li>\n" +
+            "         </ul>\n" +
+            "      </li>\n" +
+            "      <li>item 2.2</li>\n" +
+            "      </ul>\n" +
+            "   </li>\n" +
+            "</ul>"
+            ,
+            //
+            "   . item 1.1\n" +
+            "      . item 2\n" +
+            "         . item 3\n" +
+            "   . item 1.2\n"
+            ,
+            "<ul>\n" +
+            "   <li>item 1.1<br>\n" +
+            "      <ul>\n" +
+            "      <li>item 2<br>\n" +
+            "         <ul>\n" +
+            "         <li>item 3</li>\n" +
+            "         </ul>\n" +
+            "      </li>\n" +
+            "      </ul>\n" +
+            "   </li>\n" +
+            "   <li>item 1.2</li>\n" +
+            "</ul>"
+        ];
+
+
+        var container = document.getElementById("tests-content");
+        for (var i=0; i<tests.length; i+=2)  {
+            var source = tests[i];
+            var expect = tests[i+1];
+            var result = planlist.processText(source);
+            var block = document.createElement("DIV");
+            block.className = "test";
+//            block.innerHTML = "<pre><span></span></pre><div></div><pre><span></span></pre><pre><span></span></pre>";
+//            block.children[0].children[0].appendChild(document.createTextNode(source));
+//            block.children[1].innerHTML = result;
+//            block.children[2].children[0].appendChild(document.createTextNode(result));
+//            block.children[3].children[0].appendChild(document.createTextNode(expect));
+            block.innerHTML =
+                    "<pre><span>"+escapeHTML(source).replace(/\n/g,"<code>\\n</code>\n")+"</span></pre>" +
+                    "<div>"+result+"</div>" +
+                    "<pre><span>"+escapeHTML(result).replace(/\n/g,"<code>\\n</code>\n")+"</span></pre>" +
+                    "<pre><span>"+escapeHTML(expect).replace(/\n/g,"<code>\\n</code>\n")+"</span></pre>"
+            ;
+            container.appendChild(block);
+            //
+            if (expect!=result)  block.className += " error";
+        }
+    };
+
+    function escapeHTML(content)
+    {
+        return content.replace(/[&<>]/g, function(key)  {
+            return escapeHTML.REPLACE_TABLE[key] || key;
+        });
+    }
+    escapeHTML.REPLACE_TABLE = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;'
+    };
+
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>planlist.js example</title>
+    <script type="text/javascript" src="planlist.js"></script>
+</head>
+<body>
+
+
+<style>
+    ul, pre, div, h4  {
+        margin: 0;
+    }
+
+    .example  {
+        margin-top: 12px;
+        background-color: #F0F0F0;
+    }
+    .example > pre > span  {
+        background-color: #E0E0E0;
+    }
+    .example > *  {
+        display: inline-block;
+        vertical-align: top;
+    }
+    .example > *:nth-child(1)  {
+        width: 33%;
+    }
+    .example > *:nth-child(2)  {
+        left: 33%; width: 34%;
+    }
+    .example > *:nth-child(3)  {
+        right: 0; width: 33%;
+    }
+
+    #examples-header  {
+        background-color: #E0D4C0;
+    }
+</style>
+
+
+<div id="examples-header" class="example"><h4>source code</h4><h4>result view</h4><h4>result code</h4></div>
+
+<div class="example">
+    . item 1
+    . item 2
+    . item 3
+</div>
+
+<div class="example">
+    - different markers can be used
+    + (all ASCII punctuation and number characters)
+    1 item 1
+    2 item 2
+    ~ item 3
+</div>
+
+<div class="example">
+    . item 1
+        . subitem 1.1
+        . subitem 1.2
+            . subitem 1.2.1
+    . item 2
+            . subitem 2.1
+        . subitem 2.2
+</div>
+
+<div class="example">
+    . item 1
+      text on next line
+    . item 2
+                shift to the right
+        . subitem 2.1
+        subitem text
+       shift a little to the left
+    . item 3
+      first text part
+        . subitem 3.1
+      second text part
+          on multiple lines
+        . subitem 3.2
+          subitem text
+        . subitem 3.3
+      third text part
+
+out of list text (empty lines saves)
+
+               . another list
+</div>
+
+<div class="example">
+    . item 1
+      <!-- it is possible to use comments -->
+    . item 2
+      <b>and html inside items</b>
+    . <span style="color: #B00000">
+      but lines processes independently,
+    . so you can break html with new lines inside</span>
+</div>
+
+
+
+<script>
+
+    window.onload = function()  {
+        var elements = document.getElementsByClassName("example");
+        for (var i=0; i<elements.length; i++)  if (elements[i].id!="examples-header")  process(elements[i]);
+    };
+
+    function process(elem)  {
+        var container = planlist.getElement(elem);
+        var text = container.innerHTML;
+        if (text[0]=='\n')  text = text.substring(1);  //delete frist empty line
+        var result = planlist.processText(text);
+        container.innerHTML =
+                "<pre><span>"+escapeHTML(text)+"</span></pre>" +
+                "<div>"+result+"</div>" +
+                "<pre><span>"+escapeHTML(result)+"</span></pre>";
+    }
+
+    function escapeHTML(content)
+    {
+        return content.replace(/[&<>]/g, function(key)  {
+            return escapeHTML.REPLACE_TABLE[key] || key;
+        });
+    }
+    escapeHTML.REPLACE_TABLE = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;'
+    };
+
+</script>
+
+
+</body>
+</html>

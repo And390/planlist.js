@@ -2,6 +2,7 @@
 
     var planlist = this.planlist = {};
 
+    // обрабатывает указанный элемент
     planlist.process = function process(element)
     {
         if (element==undefined)  element = document.body;
@@ -20,86 +21,91 @@
     {
         var result = [];
         var spaces = [];  // пробелы для каждого уровня списка
-        var i = 0;
         //    обработать план
-        while (true)
+        for (var end=0; end<content.length; end++)  // end++ means skip '\n'
         {
             //    найти конец строки
-            var i0 = i;
-            i = content.indexOf('\n', i);
-            if (i==-1)  i = content.length;
+            var i0 = end;
+            end = content.indexOf('\n', end);
+            if (end==-1)  end = content.length;
             //    найти пробелы в начале
-            var i1 = i0;
-            while (i1<i && content.charCodeAt(i1)<=32)  i1++;
+            var i1 = skipSpaces(content, i0, end);
             //    проверить символ определяющий элемент списка и следующий пробел
             var c = content.charCodeAt(i1);  //может быть NaN или 10 ('\n'), если достингут конец строки
             var marker = MARKERS[c];
-            //    обработать строку
+            //    если маркер распознан - это новый элемент списка
             if (marker!==undefined && content.charCodeAt(i1+1)<=32)
             {
-                //    маркер распознан - это новый элемент списка
                 var space = content.substring(i0, i1);
+                var listClosed = false;
                 while (true)
                 {
                     if (spaces.length==0 || space.length>spaces[spaces.length-1].length)  {
                         //    элемент нового дочернего или корневого списка
-                        spaces.push(space);
+                        if (result.length)  result.push(listClosed ? "\n" : "<br>\n");  //перед самым первым элементом не нужна новая строка, после </ul> не нужен <br>
+                        if (spaces.length)  result.push(space);  //перед корневыми <ul> не ставить пробелы
                         result.push("<ul>\n");
+                        spaces.push(space);
                         break;
                     }
                     else if (space.length==spaces[spaces.length-1].length)  {
                         //    элемент текущего списка
+                        if (listClosed)  result.push("\n", space);
                         result.push("</li>\n");  //закрыть предыдущий элемент списка
                         break;
                     }
                     else  {
                         //    элемент родительского или соседнего списка
-                        spaces.pop();
-                        result.push("</li>\n");  //закрыть предыдущий элемент списка
-                        if (spaces.length)  result.push(spaces[spaces.length-1]);
-                        result.push("</ul>");    //закрыть предыдущий список
+                        closeList(listClosed);
+                        listClosed = true;
                     }
                 }
                 //    пропустить пробелы после маркера
-                for (i1++; i1<i && content.charCodeAt(i1)<=32; i1++)  ;
+                i1 = skipSpaces(content, i1+1, end);
                 //    добавить элемент (текущий элемент списка остается открытый)
                 result.push(space);
-                if (marker)  result.push("<li class='", marker, "'>");  else  result.push("<li>");
-                result.push(content.substring(i1, i));
+                if (marker)  result.push("<li class='", marker, "'>");
+                else  result.push("<li>");
+                result.push(content.substring(i1, end));
             }
-            //TODO продолжения родительских элементов списка
-            else if (spaces.length && (i==i1 && i!=content.length || i1-i0>=spaces[spaces.length-1].length))
-            {
-                //    для того же элемента списка продолжение на другой строке или пустая строка (!но не последняя, которая используется для полного закрытия списков)
-                if (i!=i1)  result.push("<br>");
-                result.push("\n");
-                result.push(spaces[spaces.length-1]);
-                result.push("    ");  //4 пробела длиной в "<li>"
-                if (i!=i1)  result.push(content.substring(i1, i));
-            }
+            //    иначе строка текста
             else
             {
-                //    внесписковый комментарий
-                if (spaces.length)  {
-                    //    закрыть старые списки
-                    result.push("</li>\n");
-                    for (var s=spaces.length-2; s>=0; s--)  {
-                        result.push(spaces[s]);
-                        result.push("</ul></li>\n");
-                    }
-                    result.push("</ul>\n");
-                    spaces = [];
+                //    закрыть предыдущие списки на нужное количество уровней
+                listClosed = false;
+                while (spaces.length && (i1==i0 || i1-i0<spaces[spaces.length-1].length))  {  // самый первый список может иметь нулевой отступ и надо отдельно проверить, что при пустой оступе загруваются все списки, включая корневой
+                    closeList(listClosed);
+                    listClosed = true;
                 }
                 //    добавить строку в result
-                result.push(content.substring(i0, i+1));
+                if (result.length)  result.push(listClosed ? "\n" : "<br>\n");  //перед самым первым элементом не нужна новая строка, после </ul> не нужен <br>
+                if (spaces.length)  result.push(spaces[spaces.length-1], "    ");  // + 4 пробела длиной в "<li>"
+                result.push(content.substring(i1, end));
             }
-            //    next string
-            if (i!=content.length)  i++;
-            if (i0==i)  break;  //последняя итерация цикла должна быть по пустой строке, чтобы закрыть списки
         }
+        //    закрыть открытые списки
+        for (listClosed=false; spaces.length; listClosed=true)  closeList(listClosed);
         //    done
         return result.join('');
+
+        //    вспомогательные функции
+        // возвращает индекс первого непробельного символа в string начиная с index и до end (возвращает end, если нету)
+        function skipSpaces(string, index, end)  {
+            while (index<end && content.charCodeAt(index)<=32)  index++;
+            return index;
+        }
+        // закрывает список
+        function closeList(addSpaces)  {
+            var ulSpace = spaces.pop();
+            if (addSpaces)  result.push("\n", ulSpace);
+            result.push("</li>\n");  //закрыть предыдущий элемент списка
+            if (spaces.length)  result.push(ulSpace);  //перед корневыми </ul> не ставить пробелы
+            result.push("</ul>");    //закрыть предыдущий список
+            //if (spaces.length)  result.push(spaces[spaces.length-1]);  //открытый элемент родительского списка
+        }
     };
+
+
 
     // принимает id элемента или сам элемент и возвращает его
     planlist.getElement = function getElement(element)  {
