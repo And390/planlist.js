@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>planlist.js example</title>
-    <script type="text/javascript" src="planlist.js"></script>
+    <script type="text/javascript" src="../planlist.js"></script>
 </head>
 <body>
 
@@ -99,6 +99,14 @@ out of list text (empty lines saves)
     . so you can break html with new lines inside</span>
 </div>
 
+<div class="example plan">
+    - minus
+      + plus
+      | inwork
+      / discard
+    ? question
+</div>
+
 
 
 <script>
@@ -110,13 +118,14 @@ out of list text (empty lines saves)
 
     function process(elem)  {
         var container = planlist.getElement(elem);
+        if (container.className=="example plan")  container.className = "example make_plan";
         var text = container.innerHTML;
-        if (text[0]=='\n')  text = text.substring(1);  //delete frist empty line
-        var result = planlist.processText(text);
+        if (text[0]=='\n')  text = text.substring(1);  //delete first empty line
+        var result = planlist.processText(text, true);
         container.innerHTML =
-                "<pre><span>"+escapeHTML(text)+"</span></pre>" +
-                "<div>"+result+"</div>" +
-                "<pre><span>"+escapeHTML(result)+"</span></pre>";
+                "<pre><span>"+escapeHTML(text)+"</span></pre>" +    // source html code
+                "<div>"+result+"</div>" +                           // result html markup
+                "<pre><span>"+escapeHTML(result)+"</span></pre>";   // result html code
     }
 
     function escapeHTML(content)
