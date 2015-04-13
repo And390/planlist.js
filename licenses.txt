@@ -1,0 +1,13 @@
+
+Icons from www.flaticon.com is licensed by Creative Commons BY 3.0 (http://creativecommons.org/licenses/by/3.0/):
+    image/bury.png
+    image/done.png
+    image/frozen.png
+    image/idea.png
+    image/inwork.png
+    image/warning.png
+        made by Freepik (http://www.flaticon.com/authors/freepik)
+    image/future.png
+        made by SimpleIcon (http://www.flaticon.com/authors/simpleicon)
+    image/burning.png
+        made by OCHA (http://www.flaticon.com/authors/ocha)

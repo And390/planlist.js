@@ -1,7 +1,8 @@
 planlist.js
 ===========
 Planlist.js is a simple script that allows you to easily make a plan lists in html. Like this:
-![Plan](https://cloud.githubusercontent.com/assets/10376308/6495952/7bd321d4-c2df-11e4-8705-bd1e30dbbf14.png)
+![Plan](https://cloud.githubusercontent.com/assets/10376308/7114271/896bccaa-e1e4-11e4-913b-b60d94bc2a89.png)
+
 It displays from this HTML:
 ```html
 <div class="make_plan">
@@ -12,9 +13,9 @@ It displays from this HTML:
             + write examples
         | make icons and styles for markers
             + basic simple markers
-            - more markers
+            | more markers
             - make images better
-            ? unicode characters instead of images
+            / unicode characters instead of images
         + write readme and put project on GitHub
         - write more documentation
     ? step 2: plan service
@@ -47,20 +48,7 @@ Some marker characters add a style that displays the corresponding image:
 
 (this list will be extended in the future)
 Planlist.js adds CSS rules for this styles on page load.
-If you want a simple list without images you can you other marker chars or use `make_list` style, for example:
-```html
-<div class='make_list'>
-    - item 1
-    - item 2
-    - item 3
-</div>
-```
-produce:
-<ul>
-    <li>item 1</li>
-    <li>item 2</li>
-    <li>item 3</li>
-</ul>
+
 To directly call processing for some element, use javascript:
 ```javascript
     planlist.process(element_or_id, true);  //second parameter determines, use image marker styles or not
