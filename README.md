@@ -28,12 +28,11 @@ To make it work you only need to link `planlist.js`:
 #### Details
 After been linked it processes all elements with `make_plan` style and replaces its content with plan list HTML. Syntax rules:
 
-- first space characters of each line determine a nesting level (
-compared to the previous line spaces count)
+- first space characters of each line determine a nesting level (compared to the previous line spaces count)
 - list item starts with marker character (it's all ASCII punctuation and number characters, i.e. `!"#$%&'()*+,-./0123456789:;<=>?@[\\]^_``{|}~`) followed by one or more space characters
 - neighbor list items groups to the lists and sub lists depending on nesting level (line with the same indentation as a previous is a sibling, line with a greater indentation is a child, otherwise it is a sibling of a parent)
 - all other lines is a text lines; depending on its indentation, it can belong to the previous list item (if it has the same or greater indentation) or to the parent list items or it can be out of list text
-- line separators are saves (`<br>` tags added to the result markup; this behavior can be disabled if you add `planlist.useBR=false`)
+- it saves line separators (`<br>` tags added to the result markup; this behavior can be disabled if you add `planlist.useBR=false`)
 - inner HTML is also possible
 
 Some marker characters add a style that displays the corresponding image:
@@ -43,10 +42,18 @@ Some marker characters add a style that displays the corresponding image:
 | - | absent |
 | + | done |
 | &#124; | inwork |
+| = | inwork |
 | ? | question |
 | / | discard |
+| _ | bury |
+| # | frozen |
+| * | idea |
+| ! | warning |
+| ^ | future |
+| % | burning |
+| : | detail |
 
-(this list will be extended in the future)
+(see example/markers.html, this list will be extended in the future)
 Planlist.js adds CSS rules for this styles on page load.
 
 To directly call processing for some element, use javascript:
