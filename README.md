@@ -1,9 +1,9 @@
 planlist.js
 ===========
-Planlist.js is a simple script that allows you to easily make a plan lists in html. Like this:
+Planlist.js is a simple script that allows you to easily format todo lists in HTML. Like this:
 ![Plan](https://cloud.githubusercontent.com/assets/10376308/7114271/896bccaa-e1e4-11e4-913b-b60d94bc2a89.png)
 
-It displays from this HTML:
+The source HTML:
 ```html
 <div class="make_plan">
     + think over the idea
@@ -26,16 +26,16 @@ To make it work you only need to link `planlist.js`:
 <script type="text/javascript" src="locate.js"></script>
 ```
 #### Details
-After been linked it processes all elements with `make_plan` style and replaces its content with plan list HTML. Syntax rules:
+After including it processes all DOM elements with `make_plan` class and replaces its content with plan list HTML. Syntax rules:
 
-- first space characters of each line determine a nesting level (compared to the previous line spaces count)
+- first space characters of each line determine a nesting level
 - list item starts with marker character (it's all ASCII punctuation and number characters, i.e. `!"#$%&'()*+,-./0123456789:;<=>?@[\\]^_``{|}~`) followed by one or more space characters
-- neighbor list items groups to the lists and sub lists depending on nesting level (line with the same indentation as a previous is a sibling, line with a greater indentation is a child, otherwise it is a sibling of a parent)
-- all other lines is a text lines; depending on its indentation, it can belong to the previous list item (if it has the same or greater indentation) or to the parent list items or it can be out of list text
+- adjacent list items are grouped into lists and sub-lists depending on the nesting level (line with the same indentation as the previous is a sibling, line with a greater indentation is a child, otherwise it is a sibling of a parent)
+- all other lines are text lines; depending on its indentation, it can belong to the previous list item (if it has the same or greater indentation) or to the parent list items or it can be out of list text
 - it saves line separators (`<br>` tags added to the result markup; this behavior can be disabled if you add `planlist.useBR=false`)
 - inner HTML is also possible
 
-Some marker characters add a style that displays the corresponding image:
+Special marker characters add styles with corresponding images:
 
 | char | style |
 |---|----------|
@@ -53,12 +53,13 @@ Some marker characters add a style that displays the corresponding image:
 | % | burning |
 | : | detail |
 
-(see example/markers.html, this list will be extended in the future)
+(see example/markers.html)
+
 Planlist.js adds CSS rules for this styles on page load.
 
-To directly call processing for some element, use javascript:
+To call processing directly for some element, use this javascript:
 ```javascript
-    planlist.process(element_or_id, true);  //second parameter determines, use image marker styles or not
-    // or another variant with more control
+    planlist.process(element_or_id, true);  //second parameter determines wheter to use image marker styles or not
+    // or another example with more control
     element.innerHTML = planlist.processText(element.innerHTML, true);
 ```
